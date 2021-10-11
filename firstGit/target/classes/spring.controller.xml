@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="baseController" class="com.mabo.controller.BaseController">
+        <property name="log"    ref="logUtil"></property>
+    </bean>
+    <bean id="userController" class="com.mabo.controller.UserController"  parent="baseController">
+        <property name="userService"    ref="userService"></property>
+    </bean>
+
+    <bean id="loginController" class="com.mabo.controller.LoginController" parent="baseController">
+        <property name="loginService" ref="loginService"></property>
+        <property name="classesService" ref="classesService"></property>
+    </bean>
+
+    <bean id="studentController" class="com.mabo.controller.StudentController" parent="baseController">
+        <property name="studentService"    ref="studentService"></property>
+
+    </bean>
+
+    <bean id="teacherController" class="com.mabo.controller.TeacherController" parent="baseController">
+        <property name="teacherService"    ref="teacherService"></property>
+    </bean>
+    <bean id="adminController" class="com.mabo.controller.AdminController" parent="baseController">
+        <property name="adminService"    ref="adminService"></property>
+    </bean>
+</beans>

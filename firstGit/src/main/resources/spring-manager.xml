@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <import resource="spring-dao.xml"></import>
+    <import resource="spring-service.xml"></import>
+    <import resource="spring.controller.xml"></import>
+    <import resource="spring-quartz.xml"></import>
+
+<!-- spring线程池 -->
+    <bean id="taskExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <!-- 核心线程数  -->
+        <property name="corePoolSize" value="10"/>
+        <!-- 最大线程数 -->
+        <property name="maxPoolSize" value="200"/>
+        <!-- 队列最大长度 >=mainExecutor.maxSize -->
+        <property name="queueCapacity" value="10"/>
+        <!-- 线程池维护线程所允许的空闲时间 -->
+        <property name="keepAliveSeconds" value="20"/>
+        <!-- 线程池对拒绝任务(无线程可用)的处理策略 -->
+        <property name="rejectedExecutionHandler">
+            <bean class="java.util.concurrent.ThreadPoolExecutor$CallerRunsPolicy"/>
+        </property>
+    </bean>
+<!--    响应请求的工具类-->
+    <bean id="excuteMethodUtil" class="com.mabo.utils.ExcuteMethodUtil">
+        <property name="systemLogManager"   ref="systemLogManager"></property>
+    </bean>
+<!--log输出日志-->
+    <bean id="logUtil" class="com.mabo.utils.LogUtil"></bean>
+
+<!--读取配置文件的工具类-->
+    <bean id="propertyUtil" class="com.mabo.utils.PropertyUtil">
+    </bean>
+
+<!--http响应工具-->
+    <bean id="httpReceiveUtil" class="com.mabo.manager.HttpReceiveManager">
+        <property name="taskExecutor" ref="taskExecutor"></property>
+    </bean>
+
+<!--    jedie操作工具-->
+    <bean id="jedisUtil" class="com.mabo.utils.JedisUtil">
+        <property name="log" ref="logUtil"></property>
+    </bean>
+<!--    jedisShark   redis集群工具类-->
+    <bean id="jedisSharkUtil" class="com.mabo.utils.JedisSharkUtil"></bean>
+<!--基础管理类-->
+    <bean id="baseManager" class="com.mabo.manager.BaseManager">
+        <property name="jedisSharkUtil" ref="jedisSharkUtil"></property>
+        <property name="jdbcTemplate"   ref="maboJdbcTemplate"></property>
+        <property name="propertyUtil" ref="propertyUtil"></property>
+        <property name="log"    ref="logUtil"></property>
+    </bean>
+    <bean id="teacherManager" class="com.mabo.manager.TeacherManager" parent="baseManager">
+       <property name="teacherDao"  ref="teacherDao"></property>
+    </bean>
+    <bean id="adminManager" class="com.mabo.manager.AdminManager" parent="baseManager"></bean>
+    <bean id="userManager" class="com.mabo.manager.UserManager" parent="baseManager">
+        <property name="userDao" ref="userDao"></property>
+    </bean>
+<!--系统日志管理-->
+    <bean id="systemLogManager" class="com.mabo.manager.SystemLogManager" parent="baseManager"></bean>
+</beans>
+

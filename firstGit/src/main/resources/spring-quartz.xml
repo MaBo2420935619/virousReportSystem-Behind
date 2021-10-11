@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd"
+	default-lazy-init="true">
+	<description>配置相关定时器</description>
+	<bean name = "updateInfoTask" class="com.mabo.task.UpdateInfoTask">
+		<property name="log" ref="logUtil"></property>
+		<property name="teacherManager"	ref="teacherManager"></property>
+		<property name="userManager"	ref="userManager"></property>
+		<property name="adminManager"	ref="adminManager"></property>
+		<property name="systemLogManager" ref="systemLogManager"></property>
+	</bean>
+
+	<bean id="taskTeacher"
+		  class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="updateInfoTask" />
+		<property name="targetMethod" value="updateInfoTask" />
+		<!-- 同一任务在前一次执行未完成而Trigger时间又到时是否并发开始新的执行, 默认为true. -->
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="cronTriggerTeacher"
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="taskTeacher" />
+		<!-- 每1分钟执行一次 -->
+		<property name="cronExpression" value="0 */1 * * * ?" />
+	</bean>
+
+
+<!--	系统日志-->
+	<bean id="taskSystemLog"
+		  class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="updateInfoTask" />
+		<property name="targetMethod" value="updateSystemLogTask" />
+		<!-- 同一任务在前一次执行未完成而Trigger时间又到时是否并发开始新的执行, 默认为true. -->
+		<property name="concurrent" value="false" />
+	</bean>
+	<bean id="cronTriggerSystemLog"
+		  class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="taskSystemLog" />
+		<!-- 每天0点 -->
+		<property name="cronExpression" value="0 0 0 * * ?" />
+	</bean>
+
+
+	<!-- Quartz本地Scheduler -->
+	<bean id="schedulerFactory"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<!-- Triggers集成 -->
+		<property name="triggers">
+			<list>
+				<ref bean="cronTriggerTeacher" />
+				<ref bean="cronTriggerSystemLog" />
+			</list>
+		</property>
+		<!-- Quartz配置, 本地运行无需单独的quartz.properties文件，在此简单配置即可 -->
+		<property name="quartzProperties">
+			<props>
+				<prop key="org.quartz.threadPool.threadCount">50</prop>
+			</props>
+		</property>
+		<!-- 启动时延期2秒开始任务 -->
+		<property name="startupDelay" value="20" />
+	</bean>
+
+
+</beans>

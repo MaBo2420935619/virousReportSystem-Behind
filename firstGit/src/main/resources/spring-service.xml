@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<!--    service基础类-->
+    <bean id="baseService" class="com.mabo.service.BaseService">
+        <property name="jedisSharkUtil" ref="jedisSharkUtil"></property>
+    </bean>
+    <bean id="userService" class="com.mabo.service.UserService" parent="baseService">
+        <property name="userDao" ref="userDao"></property>
+        <property name="log" ref="logUtil"></property>
+    </bean>
+    <bean id="loginService" class="com.mabo.service.LoginService" parent="baseService">
+        <property name="loginDao" ref="loginDao"></property>
+        <property name="classesDao" ref="classesDao"></property>
+    </bean>
+    <bean id="classesService" class="com.mabo.service.ClassesService" parent="baseService">
+        <property name="classesDao" ref="classesDao"></property>
+    </bean>
+    <bean id="studentService" class="com.mabo.service.StudentService" parent="baseService">
+        <property name="studentDao" ref="studentDao"></property>
+    </bean>
+    <bean id="teacherService" class="com.mabo.service.TeacherService" parent="baseService">
+        <property name="teacherDao" ref="teacherDao"></property>
+        <property name="log" ref="logUtil"></property>
+    </bean>
+    <bean id="adminService" class="com.mabo.service.AdminService" parent="baseService">
+        <property name="adminDao" ref="adminDao"></property>
+    </bean>
+</beans>
